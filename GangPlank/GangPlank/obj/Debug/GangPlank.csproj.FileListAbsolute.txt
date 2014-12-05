@@ -1,0 +1,10 @@
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\GangPlank.exe.config
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\GangPlank.exe
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\GangPlank.pdb
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\LeagueSharp.Common.dll
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\LeagueSharp.dll
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\SharpDX.dll
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\SharpDX.Direct3D9.dll
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\bin\Release\LeagueSharp.xml
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\obj\Debug\GangPlank.exe
+E:\LeagueSharp\MyProjects\GangPlank\GangPlank\obj\Debug\GangPlank.pdb

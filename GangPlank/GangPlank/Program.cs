@@ -26,7 +26,6 @@ namespace GangPlank
         static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
-            Game.PrintChat("test ba");
         }
 
 
@@ -46,6 +45,16 @@ namespace GangPlank
 
 
             Config = new Menu(ChampName, ChampName, true);
+
+
+            var tsMenu = new Menu("Target Selector", "Target Selector");
+            SimpleTs.AddToMenu(tsMenu);
+            Config.AddSubMenu(tsMenu);
+            Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
+            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
+
+            
+
             Config.AddSubMenu(new Menu("Combo Settings", "combo"));
             Config.SubMenu("combo").AddItem(new MenuItem("comboKey", "Full Combo Key").SetValue(new KeyBind(32, KeyBindType.Press)));
             Config.SubMenu("combo").AddItem(new MenuItem("autoIgnite", "Use Ignite in combo").SetValue(true));
@@ -61,29 +70,25 @@ namespace GangPlank
             Config.SubMenu("farm").AddItem(new MenuItem("qFarm", "Farm with (Q)").SetValue(true));
             Config.SubMenu("farm").AddItem(new MenuItem("farmMana", "Min. Mana Percent: ").SetValue(new Slider(50)));
 
-            Config.AddSubMenu(new Menu("Draw Settings", "drawing"));
-            Config.SubMenu("drawing").AddItem(new MenuItem("mDraw", "Disable All Range Draws").SetValue(false));
-            Config.SubMenu("drawing").AddItem(new MenuItem("Target", "Draw Circle on Target").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 0, 0))));
-            Config.SubMenu("drawing").AddItem(new MenuItem("QDraw", "Draw (Q) Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 178, 0, 0))));
 
             Config.AddSubMenu(new Menu("Misc Settings", "misc"));
             Config.SubMenu("misc").AddItem(new MenuItem("usePackets", "Use Packets to Cast Spells").SetValue(false));
             Config.SubMenu("misc").AddItem(new MenuItem("anticc", "Use Scurvy when stunned/rooted").SetValue(new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle)));
 
-            Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
-            var tsMenu = new Menu("Target Selector", "Target Selector");
-            SimpleTs.AddToMenu(tsMenu);
-            Config.AddSubMenu(tsMenu);
+            Config.AddSubMenu(new Menu("Draw Settings", "drawing"));
+            Config.SubMenu("drawing").AddItem(new MenuItem("mDraw", "Disable All Range Draws").SetValue(false));
+            Config.SubMenu("drawing").AddItem(new MenuItem("Target", "Draw Circle on Target").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 0, 0))));
+            Config.SubMenu("drawing").AddItem(new MenuItem("QDraw", "Draw (Q) Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 178, 0, 0))));
+
+
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnGameUpdate += Game_OnGameUpdate;
 
-
-            //            Obj_AI_Base.OnProcessSpellCast += Game_OnProcessSpell;
-            //            GameObject.OnDelete += Game_OnObjectDelete;
+            
             Game.PrintChat("<font color=\"#00BFFF\">GankPlank by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
+            Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.0</font>");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
