@@ -16,6 +16,7 @@ namespace GangPlank
         public static Spell Q;
         public static Spell W;
         public static Spell E;
+//        public static Spell R;
         public static SpellSlot IgniteSlot;
         private static Obj_AI_Hero _player;
 
@@ -35,20 +36,22 @@ namespace GangPlank
 
             Q = new Spell(SpellSlot.Q, 625);
             W = new Spell(SpellSlot.W, 0);
-            E = new Spell(SpellSlot.E, 1300);
+            E = new Spell(SpellSlot.E, 1300);            
+//            R = new Spell(SpellSlot.R, 0);
 
             IgniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot");
 
             Spells.Add(Q);
             Spells.Add(W);
             Spells.Add(E);
+//            Spells.Add(R);
 
 
             Config = new Menu(ChampName, ChampName, true);
 
 
             var tsMenu = new Menu("Target Selector", "Target Selector");
-            SimpleTs.AddToMenu(tsMenu);
+            TargetSelector.AddToMenu(tsMenu);
             Config.AddSubMenu(tsMenu);
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
@@ -76,6 +79,7 @@ namespace GangPlank
             Config.SubMenu("misc").AddItem(new MenuItem("autoheal", "Use Scurvy to heal yourself").SetValue(new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
             Config.SubMenu("misc").AddItem(new MenuItem("autohealhp", "Min Percentage of HP to use W").SetValue(new Slider(40, 1)));
             Config.SubMenu("misc").AddItem(new MenuItem("autohealmana", "Min. Mana for AutoHeal").SetValue(new Slider(40, 1)));
+//            Config.SubMenu("misc").AddItem(new MenuItem("ultks", "Ult KS").SetValue(false));
 
             Config.AddSubMenu(new Menu("Draw Settings", "drawing"));
             Config.SubMenu("drawing").AddItem(new MenuItem("mDraw", "Disable All Range Draws").SetValue(false));
@@ -89,16 +93,18 @@ namespace GangPlank
             Game.OnGameUpdate += Game_OnGameUpdate;
 
 
-            Game.PrintChat("<font color=\"#00BFFF\">GankPlank by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
-            Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.1</font>");
+            Game.PrintChat("<font color=\"#00BFFF\">Daimao GankPlank by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
+            Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.0.2</font>");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            var target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+//            var ultitarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
             var comboKey = Config.Item("comboKey").GetValue<KeyBind>().Active;
             var harassKey = Config.Item("harassKey").GetValue<KeyBind>().Active;
             var farmKey = Config.Item("farmKey").GetValue<KeyBind>().Active;
+//            var ultks = Config.Item("ultks").GetValue<KeyBind>().Active;
             var autoheal = Config.Item("autoheal").GetValue<KeyBind>().Active;
 
             if (comboKey && target != null)
@@ -111,21 +117,21 @@ namespace GangPlank
                 if (farmKey)
                     Farm();
 
-                if (Config.Item("autoQ").GetValue<KeyBind>().Active && target != null && ObjectManager.Player.Distance(target) <= Q.Range && Q.IsReady())
+                if (Config.Item("autoQ").GetValue<KeyBind>().Active && target != null &&
+                    ObjectManager.Player.Distance(target) <= Q.Range && Q.IsReady())
                     Q.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
 
                 if (autoheal)
                     AutoHeal();
+
+                if (Config.Item("anticc").GetValue<KeyBind>().Active && W.IsReady() &&
+                    (_player.HasBuffOfType(BuffType.Stun) || _player.HasBuffOfType(BuffType.Fear) ||
+                     _player.HasBuffOfType(BuffType.Snare) || _player.HasBuffOfType(BuffType.Taunt)))
+                    W.Cast();
+
             }
 
-            if (Config.Item("anticc").GetValue<KeyBind>().Active && W.IsReady() &&
-                (_player.HasBuffOfType(BuffType.Stun) || _player.HasBuffOfType(BuffType.Fear) ||
-                 _player.HasBuffOfType(BuffType.Slow) || _player.HasBuffOfType(BuffType.Snare) ||
-                 _player.HasBuffOfType(BuffType.Taunt)))
-            W.Cast();
-
         }
-
 
         private static void Drawing_OnDraw(EventArgs args)
         {
@@ -136,7 +142,7 @@ namespace GangPlank
             {
                 Utility.DrawCircle(ObjectManager.Player.Position, spell.Range,Config.Item(spell.Slot + "Draw").GetValue<Circle>().Color);
             }
-            var target = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (Config.Item("Target").GetValue<Circle>().Active && target != null) Utility.DrawCircle(target.Position, 50, Config.Item("Target").GetValue<Circle>().Color, 1, 50);
         }
 
@@ -171,13 +177,13 @@ namespace GangPlank
                 return;
 
             if (IgniteSlot == SpellSlot.Unknown ||
-                ObjectManager.Player.SummonerSpellbook.CanUseSpell(IgniteSlot) != SpellState.Ready)
+                ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready)
                 return;
 
             if (!(ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) >= target.Health))
                 return;
 
-            ObjectManager.Player.SummonerSpellbook.CastSpell(IgniteSlot, target);
+            ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
         }
 
 
@@ -219,7 +225,8 @@ namespace GangPlank
             if (Q.IsReady()) dmg += (target.Health <= target.MaxHealth*0.15)? (ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)*2) : ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
             if (W.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
             if (E.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
-            if (IgniteSlot != SpellSlot.Unknown && ObjectManager.Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready) dmg += ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+ //           if (R.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
+            if (IgniteSlot != SpellSlot.Unknown && ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready) dmg += ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
             return (float) dmg;
         }
     }
