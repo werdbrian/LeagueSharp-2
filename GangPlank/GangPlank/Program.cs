@@ -79,7 +79,7 @@ namespace GangPlank
             Config.SubMenu("misc").AddItem(new MenuItem("autoheal", "Use Scurvy to heal yourself").SetValue(new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
             Config.SubMenu("misc").AddItem(new MenuItem("autohealhp", "Min Percentage of HP to use W").SetValue(new Slider(40, 1)));
             Config.SubMenu("misc").AddItem(new MenuItem("autohealmana", "Min. Mana for AutoHeal").SetValue(new Slider(40, 1)));
-            Config.SubMenu("misc").AddItem(new MenuItem("ultks", "Ult KS").SetValue(false));
+//            Config.SubMenu("misc").AddItem(new MenuItem("ultks", "Ult KS").SetValue(false));
 
             Config.AddSubMenu(new Menu("Draw Settings", "drawing"));
             Config.SubMenu("drawing").AddItem(new MenuItem("mDraw", "Disable All Range Draws").SetValue(false));
