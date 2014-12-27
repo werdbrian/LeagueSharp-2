@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq; 
 using System.Drawing;
-using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
+using Color = System.Drawing.Color;
 
-namespace GangPlank
+namespace Mundo
 {
     internal class Program
     {
         //      {
-        private const string ChampName = "Gangplank";
+        private const string ChampName = "DrMundo";
         public static Orbwalking.Orbwalker Orbwalker;
         public static List<Spell> Spells = new List<Spell>();
         public static Spell Q;
@@ -34,10 +36,12 @@ namespace GangPlank
             if (_player.BaseSkinName != ChampName)
                 return;
 
-            Q = new Spell(SpellSlot.Q, 625);
-            W = new Spell(SpellSlot.W, 0);
-            E = new Spell(SpellSlot.E, 1300);            
-            R = new Spell(SpellSlot.R);
+            Q = new Spell(SpellSlot.Q, 1000);
+            Q.SetSkillshot(0.25f, 60f, 2000f, true, SkillshotType.SkillshotLine);
+
+            W = new Spell(SpellSlot.W, 160);
+            E = new Spell(SpellSlot.E, 0);            
+            R = new Spell(SpellSlot.R, 0);
 
             IgniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot");
 
@@ -61,52 +65,45 @@ namespace GangPlank
             Config.SubMenu("combo").AddItem(new MenuItem("comboKey", "Full Combo Key").SetValue(new KeyBind(32, KeyBindType.Press)));
             Config.SubMenu("combo").AddItem(new MenuItem("autoIgnite", "Use Ignite in combo").SetValue(true));
 
-
             Config.AddSubMenu(new Menu("Harass Settings", "harass"));
             Config.SubMenu("harass").AddItem(new MenuItem("autoQ", "Auto-Q when Target in Range").SetValue(new KeyBind("Z".ToCharArray()[0],KeyBindType.Toggle)));
             Config.SubMenu("harass").AddItem(new MenuItem("harassKey", "Harass Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-            Config.SubMenu("harass").AddItem(new MenuItem("harassMana", "Min. Mana Percent: ").SetValue(new Slider(50)));
 
             Config.AddSubMenu(new Menu("Farming Settings", "farm"));
             Config.SubMenu("farm").AddItem(new MenuItem("farmKey", "Farming Key").SetValue(new KeyBind("G".ToCharArray()[0], KeyBindType.Press)));
-            Config.SubMenu("farm").AddItem(new MenuItem("qFarm", "Farm with (Q)").SetValue(true));
-            Config.SubMenu("farm").AddItem(new MenuItem("farmMana", "Min. Mana Percent: ").SetValue(new Slider(50)));
-
-
+//            Config.SubMenu("farm").AddItem(new MenuItem("qFarm", "Farm with (Q)").SetValue(true));
+            
             Config.AddSubMenu(new Menu("Misc Settings", "misc"));
             Config.SubMenu("misc").AddItem(new MenuItem("usePackets", "Use Packets to Cast Spells").SetValue(false));
-            Config.SubMenu("misc").AddItem(new MenuItem("anticc", "Use Scurvy when stunned/rooted").SetValue(new KeyBind("H".ToCharArray()[0],KeyBindType.Toggle)));
-            Config.SubMenu("misc").AddItem(new MenuItem("autoheal", "Use Scurvy to heal yourself").SetValue(new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
-            Config.SubMenu("misc").AddItem(new MenuItem("autohealhp", "Min Percentage of HP to use W").SetValue(new Slider(40, 1)));
-            Config.SubMenu("misc").AddItem(new MenuItem("autohealmana", "Min. Mana for AutoHeal").SetValue(new Slider(40, 1)));
-            Config.SubMenu("misc").AddItem(new MenuItem("ultks", "Ult KS").SetValue(false));
+            Config.SubMenu("misc").AddItem(new MenuItem("autoheal", "Auto Ult when low hp").SetValue(new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.SubMenu("misc").AddItem(new MenuItem("autohealhp", "Min Percentage of HP to use R").SetValue(new Slider(40, 1)));
 
             Config.AddSubMenu(new Menu("Draw Settings", "drawing"));
             Config.SubMenu("drawing").AddItem(new MenuItem("mDraw", "Disable All Range Draws").SetValue(false));
             Config.SubMenu("drawing").AddItem(new MenuItem("Target", "Draw Circle on Target").SetValue(new Circle(true,Color.FromArgb(255, 255, 0, 0))));
             Config.SubMenu("drawing").AddItem(new MenuItem("QDraw", "Draw (Q) Range").SetValue(new Circle(true, Color.FromArgb(255, 178, 0, 0))));
 
-
+            
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnGameUpdate += Game_OnGameUpdate;
 
 
-            Game.PrintChat("<font color=\"#00BFFF\">Daimao GankPlank by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
-            Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.0.2</font>");
+            Game.PrintChat("<font color=\"#00BFFF\">Daimao Mundo by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
+            Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.0.0</font>");
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-            var ultitarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             var comboKey = Config.Item("comboKey").GetValue<KeyBind>().Active;
             var harassKey = Config.Item("harassKey").GetValue<KeyBind>().Active;
             var farmKey = Config.Item("farmKey").GetValue<KeyBind>().Active;
-//            var ultks = Config.Item("ultks").GetValue<KeyBind>().Active;
             var autoheal = Config.Item("autoheal").GetValue<KeyBind>().Active;
 
+            if (autoheal)
+                AutoHeal();
 
             if (comboKey && target != null)
                 Combo(target);
@@ -120,19 +117,8 @@ namespace GangPlank
 
                 if (Config.Item("autoQ").GetValue<KeyBind>().Active && target != null &&
                     ObjectManager.Player.Distance(target) <= Q.Range && Q.IsReady())
-                    Q.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
+                    CastBasicSkillShot(Q, Q.Range, TargetSelector.DamageType.Physical, HitChance.High);
 
-                if (autoheal)
-                    AutoHeal();
-
-                if (Config.Item("anticc").GetValue<KeyBind>().Active && W.IsReady() &&
-                    (_player.HasBuffOfType(BuffType.Stun) || _player.HasBuffOfType(BuffType.Fear) ||
-                     _player.HasBuffOfType(BuffType.Snare) || _player.HasBuffOfType(BuffType.Taunt)))
-                    W.Cast();
-
-                if (Config.Item("ultks").GetValue<KeyBind>().Active && R.IsReady() && ((_player.GetSpellDamage(ultitarget, SpellSlot.R)) > ultitarget.Health))
-                R.Cast(ultitarget);
-               
             }
 
         }
@@ -150,32 +136,29 @@ namespace GangPlank
             if (Config.Item("Target").GetValue<Circle>().Active && target != null) Utility.DrawCircle(target.Position, 50, Config.Item("Target").GetValue<Circle>().Color, 1, 50);
         }
 
-
-        private static void AutoHeal()
+                private static void AutoHeal()
         {
-
-            var mana = ObjectManager.Player.MaxMana * (Config.Item("autohealmana").GetValue<Slider>().Value / 100.0);
-            if (!(ObjectManager.Player.Mana > mana))
-                return;
 
             var health = ObjectManager.Player.MaxHealth * (Config.Item("autohealhp").GetValue<Slider>().Value / 100.0);
             if (ObjectManager.Player.Health > health)
                 return;
 
-            if (W.IsReady())
-                W.Cast();
+            if (R.IsReady())
+                R.Cast();
         }
+
 
         private static void Combo(Obj_AI_Base target)
         {
             if (target == null)
                 return;
 
+            if (Q.IsReady())
+                CastBasicSkillShot(Q, Q.Range, TargetSelector.DamageType.Magical, HitChance.High);
+
             if (E.IsReady())
                 E.Cast();
 
-            if (Q.IsReady())
-                Q.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
 
             if (!Config.Item("autoIgnite").GetValue<bool>())
                 return;
@@ -196,13 +179,11 @@ namespace GangPlank
             if (target == null)
                 return;
 
-            var mana = ObjectManager.Player.MaxMana*(Config.Item("harassMana").GetValue<Slider>().Value/100.0);
-            if (!(ObjectManager.Player.Mana > mana))
-                return;
 
             if (Q.IsReady())
-                Q.CastOnUnit(target, Config.Item("usePackets").GetValue<bool>());
+                CastBasicSkillShot(Q, Q.Range, TargetSelector.DamageType.Physical, HitChance.High);
         }
+
 
         private static void Farm()
         {
@@ -217,7 +198,8 @@ namespace GangPlank
             foreach (var minion in from minion in minions
                 let actualHp =(HealthPrediction.GetHealthPrediction(minion,(int) (ObjectManager.Player.Distance(minion)*1000/1500)) <= minion.MaxHealth*0.15)? ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q)*2 : ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q) where minion.IsValidTarget() && HealthPrediction.GetHealthPrediction(minion,(int) (ObjectManager.Player.Distance(minion)*1000/1500)) <= actualHp select minion)
             {
-                Q.CastOnUnit(minion, Config.Item("usePackets").GetValue<bool>());
+
+                Q.Cast(minion, Config.Item("usePackets").GetValue<bool>());
                 return;
             }
         }
@@ -228,10 +210,28 @@ namespace GangPlank
             var dmg = 0d;
             if (Q.IsReady()) dmg += (target.Health <= target.MaxHealth*0.15)? (ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)*2) : ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
             if (W.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
-            if (E.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
-            if (R.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
+ //           if (E.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.E);
+ //           if (R.IsReady()) dmg += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
             if (IgniteSlot != SpellSlot.Unknown && ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready) dmg += ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
             return (float) dmg;
         }
+
+
+
+        public static void CastBasicSkillShot(Spell spell, float range, LeagueSharp.Common.TargetSelector.DamageType type, HitChance hitChance)
+        {
+            var target = LeagueSharp.Common.TargetSelector.GetTarget(range, type);
+            if (target == null || !spell.IsReady())
+            return;
+            spell.UpdateSourcePosition();
+            if (spell.GetPrediction(target).Hitchance >= hitChance)
+            spell.Cast(target, packets());
+        }
+
+         public static bool packets()
+        {
+            return Config.Item("usePackets").GetValue<bool>();
+        }
+
     }
 }

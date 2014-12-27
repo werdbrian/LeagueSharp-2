@@ -10,6 +10,5 @@ E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.To
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\LeagueSharp.xml
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.xml
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.Graphics.xml
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\obj\Debug\GangPlank.csprojResolveAssemblyReference.cache
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\obj\Debug\GangPlank.exe
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\obj\Debug\GangPlank.pdb
