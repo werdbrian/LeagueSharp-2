@@ -1,14 +1,1 @@
 E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\GangPlank.exe.config
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\GangPlank.exe
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\GangPlank.pdb
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\LeagueSharp.Common.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\LeagueSharp.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Direct3D9.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.Graphics.dll
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\LeagueSharp.xml
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.xml
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\SharpDX.Toolkit.Graphics.xml
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\obj\Debug\GangPlank.exe
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\obj\Debug\GangPlank.pdb
