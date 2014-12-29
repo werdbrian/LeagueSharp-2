@@ -1,1 +1,0 @@
-E:\Visual Studio Projects\LeagueSharp\GangPlank\GangPlank\bin\Release\GangPlank.exe.config
