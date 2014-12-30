@@ -62,6 +62,7 @@ namespace Kennen
 
             Config.AddSubMenu(new Menu("Combo Settings", "combo"));
             Config.SubMenu("combo").AddItem(new MenuItem("comboKey", "Full Combo Key").SetValue(new KeyBind(32, KeyBindType.Press)));
+            Config.SubMenu("combo").AddItem(new MenuItem("UseE", "Use E in combo").SetValue(false));
             Config.SubMenu("combo").AddItem(new MenuItem("autoIgnite", "Use Ignite in combo").SetValue(true));
 
             Config.AddSubMenu(new Menu("Harass Settings", "harass"));
@@ -167,8 +168,8 @@ namespace Kennen
             R.Cast();
 
         }
-  
- 
+
+
 
         private static void Combo(Obj_AI_Base target)
         {
@@ -178,29 +179,32 @@ namespace Kennen
             if (Q.IsReady())
                 CastBasicSkillShot(Q, Q.Range, TargetSelector.DamageType.Magical, HitChance.High);
 
-            if (E.IsReady())
+            if (target != null && Config.Item("UseE").GetValue<bool>() && E.IsReady())
                 E.Cast();
 
-            if (target != null && ObjectManager.Player.Distance(target) <= W.Range && W.IsReady())
-                W.Cast();
+            else
+            {
 
-            if (target != null && ObjectManager.Player.Distance(target) <= R.Range && R.IsReady())
-                R.Cast();
+                if (target != null && ObjectManager.Player.Distance(target) <= W.Range && W.IsReady())
+                    W.Cast();
+
+                if (target != null && ObjectManager.Player.Distance(target) <= R.Range && R.IsReady())
+                    R.Cast();
 
 
-            if (!Config.Item("autoIgnite").GetValue<bool>())
-                return;
+                if (!Config.Item("autoIgnite").GetValue<bool>())
+                    return;
 
-            if (IgniteSlot == SpellSlot.Unknown ||
-                ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready)
-                return;
+                if (IgniteSlot == SpellSlot.Unknown ||
+                    ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) != SpellState.Ready)
+                    return;
 
-            if (!(ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) >= target.Health))
-                return;
+                if (!(ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) >= target.Health))
+                    return;
 
-            ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
+                ObjectManager.Player.Spellbook.CastSpell(IgniteSlot, target);
+            }
         }
-
 
         private static void Harass(Obj_AI_Base target)
         {
