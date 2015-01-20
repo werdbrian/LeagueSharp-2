@@ -162,7 +162,7 @@ namespace Kennen
         {
             var rtarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             var RMinHit = Config.Item("useRhit").GetValue<Slider>().Value;
-            var enemiesHit = ObjectManager.Player.CountEnemysInRange(470);
+            var enemiesHit = ObjectManager.Player.CountEnemiesInRange(470);
 
             if (rtarget != null && ObjectManager.Player.Distance(rtarget) <= R.Range && (RMinHit <= enemiesHit) && R.IsReady())
             R.Cast();
