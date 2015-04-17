@@ -90,8 +90,8 @@ namespace Kennen
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnGameUpdate += Game_OnGameUpdate;
-
+           // Game.OnGameUpdate += ;
+            Game.OnUpdate += Game_OnGameUpdate;
 
             Game.PrintChat(
                 "<font color=\"#00BFFF\">Daimao Kennen by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
