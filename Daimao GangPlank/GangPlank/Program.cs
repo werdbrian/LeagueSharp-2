@@ -90,6 +90,8 @@ namespace GangPlank
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
+           // Game.OnUpdate += Game_OnGameUpdate;
+            // Game.OnGameUpdate += ;
             Game.OnUpdate += Game_OnGameUpdate;
 
 
