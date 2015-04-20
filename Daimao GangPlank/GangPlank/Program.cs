@@ -90,8 +90,8 @@ namespace GangPlank
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnGameUpdate += Game_OnGameUpdate;
-
+            //Game.OnGameUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Game_OnGameUpdate;
 
             Game.PrintChat("<font color=\"#00BFFF\">Daimao GankPlank by Taerarenai -</font> <font color=\"#FFFFFF\">Loaded</font>");
             Game.PrintChat("<font color=\"#00BFFF\">Version:</font> <font color=\"#FFFFFF\">1.0.0.2</font>");
